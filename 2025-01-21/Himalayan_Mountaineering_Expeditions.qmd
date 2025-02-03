@@ -1,0 +1,25 @@
+---
+title: "Himalayan Mountaineering Expeditions"
+author: Sidney Langford
+format: html
+---
+
+```{r, message = F}
+library(tidyverse)
+library("RColorBrewer")
+
+exped_tidy <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-01-21/exped_tidy.csv')
+peaks_tidy <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-01-21/peaks_tidy.csv')
+
+```
+
+```{r}
+exped_tidy %>% 
+  group_by(PEAKID) %>% 
+  reframe(n = n(), PEAKID, SUCCESS1) %>% 
+  filter(n > 35) %>% 
+  ggplot(aes(x = PEAKID, fill = SUCCESS1)) +
+  geom_bar() +
+  scale_fill_brewer(palette="Pastel1") +
+  labs(x = 'Peak', y = "Number of Attempts", fill = "Success", title = "Expedition Attempts and Successes of the Top 5 Most Popular Himalayan Peaks")
+```
