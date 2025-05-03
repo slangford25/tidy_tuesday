@@ -1,0 +1,59 @@
+---
+title: "fatal-car-crashes"
+format: html
+---
+
+```{r}
+library(tidyverse)
+
+daily_accidents <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-04-22/daily_accidents.csv')
+
+daily_accidents_420 <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-04-22/daily_accidents_420.csv')
+```
+```{r}
+fixed <- daily_accidents_420 %>%
+  mutate(date = ymd(date)) %>% 
+  mutate(month_day = format(date, "%m-%d")) %>%
+  group_by(month_day) %>%
+  summarise(total_fatalities = sum(fatalities_count, na.rm = TRUE)) %>%
+  ungroup()
+```
+
+
+
+```{r}
+fixed %>% 
+  filter(month_day != "02-29") %>% 
+  ggplot(aes(x = month_day, y = total_fatalities)) +
+  geom_point() +
+  geom_smooth()
+
+```
+```{r}
+fixed %>%
+  filter(month_day != "02-29") %>%
+  mutate(month_day_date = ymd(paste0("2000-", month_day))) %>%
+  ggplot(aes(x = month_day_date, y = total_fatalities)) +
+  geom_point(alpha = 0.8) +
+  geom_smooth(se = FALSE, color = "darkgreen") +
+    annotate("segment",
+           x = ymd("2000-04-20"),
+           xend = ymd("2000-04-20"),  
+           y =  max(fixed$total_fatalities, na.rm = TRUE) * 0.95,
+           yend = max(fixed$total_fatalities[fixed$month_day == "04-20"] +30, na.rm = TRUE),
+           arrow = arrow(length = unit(0.25, "cm")),
+           color = "lightgreen",
+           size = .5) +
+  annotate("text",
+           x = ymd("2000-04-20"),
+           y = max(fixed$total_fatalities, na.rm = TRUE) * 0.95,
+           label = "04/20",
+           color = "darkgreen",
+           vjust = -0.5,
+           hjust = 1,
+           size = 4) +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+  labs(x = "Date", y = "Total Fatalities", title = "Car Crash Fatalities by Date") +
+  theme_minimal()
+```
+
