@@ -1,0 +1,93 @@
+---
+title: "NSF Terminations"
+format: html
+---
+
+```{r}
+library(tidyverse)
+library(MetBrewer)
+library(lubridate)
+
+nsf <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-05-06/nsf_terminations.csv')
+
+state_results <- tribble(
+  ~org_state, ~party,
+  "AL", "Republican",
+  "AK", "Republican",
+  "AZ", "Republican",
+  "AR", "Republican",
+  "CA", "Democrat",
+  "CO", "Democrat",
+  "CT", "Democrat",
+  "DC", "Democrat",
+  "DE", "Democrat",
+  "FL", "Republican",
+  "GA", "Republican",
+  "HI", "Democrat",
+  "ID", "Republican",
+  "IL", "Democrat",
+  "IN", "Republican",
+  "IA", "Republican",
+  "KS", "Republican",
+  "KY", "Republican",
+  "LA", "Republican",
+  "ME", "Democrat",
+  "MD", "Democrat",
+  "MA", "Democrat",
+  "MI", "Republican",
+  "MN", "Democrat",
+  "MS", "Republican",
+  "MO", "Republican",
+  "MT", "Republican",
+  "NE", "Republican",
+  "NV", "Democrat",
+  "NH", "Democrat",
+  "NJ", "Democrat",
+  "NM", "Democrat",
+  "NY", "Democrat",
+  "NC", "Republican",
+  "ND", "Republican",
+  "OH", "Republican",
+  "OK", "Republican",
+  "OR", "Democrat",
+  "PA", "Republican",
+  "RI", "Democrat",
+  "SC", "Republican",
+  "SD", "Republican",
+  "TN", "Republican",
+  "TX", "Republican",
+  "UT", "Republican",
+  "VT", "Democrat",
+  "VA", "Democrat",
+  "WA", "Democrat",
+  "WV", "Republican",
+  "WI", "Republican",
+  "WY", "Republican"
+)
+
+```
+
+```{r}
+nsf <- nsf %>% 
+  left_join(state_results)
+```
+
+```{r}
+nsf %>% 
+  filter(!is.na(directorate)) %>% 
+  filter(!is.na(party)) %>% 
+  ggplot(aes(x = fct_infreq(directorate), fill = party)) +
+  geom_bar() +
+  coord_flip() +
+    scale_fill_manual(values = c("Republican" = "red", "Democrat" = "blue")) +
+  labs(title = "Grants Terminated per Directorate by State Election Results",
+       x = "Directorate",
+       y = "Number of Grants Terminated",
+       fill = "State Election Results") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),          
+    plot.title.position = "plot"                  
+  )
+```
+
